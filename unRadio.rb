@@ -11,7 +11,7 @@ d.each {|rubyFile|
   end
 }
 
-$unkown_block_headers = [
+$UNKOWN_BLOCK_HEADERS = [
   "0000",
   "0001",
   "0002",
@@ -57,7 +57,7 @@ $data	= File.new("#{file.split(".")[0]}.txt", "wb")
 start	= TRUE
 while offset < File.size(file)
   byte	= IO.binread(file, 2, offset).unpack("H*").join
-  if $unkown_block_headers.include? byte
+  if $UNKOWN_BLOCK_HEADERS.include? byte
     size	= 36
     $data.write IO.binread(file, size, offset).unpack("H*").join
     $data.write "\r\n"
