@@ -1,94 +1,51 @@
+$HASH_MAP = {
+  "0d86" => "if",
+  "226d" => "menu",
+  "22ff" => "mesg",
+  "24e1" => "radio",
+  "306a" => "light",
+  "430d" => "delay",
+  "4ad9" => "system",
+  "5c9e" => "varsave",
+  "64c0" => "eval",
+  "698d" => "sound",
+  "9906" => "chara",
+  "9a1f" => "start",
+  "a242" => "demo",
+  "b96e" => "print",
+  "c091" => "map",
+  "c8bb" => "load",
+  "dbab" => "ntrap",
+  "e43c" => "str_status",
+  "ec9d" => "jimaku",
+  "eee9" => "camera",
+  "6d43" => "00a_o1",
+  "6d44" => "00a_o2",
+  "6d45" => "00a_o3",
+  "6d46" => "00a_o4",
+  "6da3" => "00a_r1",
+  "6da4" => "00a_r2",
+  "7693" => "sne_wet2",
+  "c661" => "00a",
+  "e224" => "null",
+  "e8fe" => "sne_00a",
+  "21ca" => "Solid_Snake",
+  "6588" => "Roy_Campbell",
+  "9475" => "Naomi",
+  "95f2" => "Meryl",
+  "d78a" => "Mei_Ling",
+  "7982" => "Cyborg_Ninja",
+  "33af" => "Unknown01",
+  "6c22" => "Master_Miller",
+  "3d2c" => "Otacon",
+  "fb95" => "Jim_Houseman",
+  "7c90" => "Unknown00",
+}
+
 def dehash(hash)
-	if hash == "0d86"
-		$data.write "if"
-	elsif hash == "226d"
-		$data.write "menu"
-	elsif hash == "22ff"
-		$data.write "mesg"
-	elsif hash == "24e1"
-		$data.write "radio"
-	elsif hash == "306a"
-		$data.write "light"
-	elsif hash == "430d"
-		$data.write "delay"
-	elsif hash == "4ad9"
-		$data.write "system"
-	elsif hash == "5c9e"
-		$data.write "varsave"
-	elsif hash == "64c0"
-		$data.write "eval"
-	elsif hash == "698d"
-		$data.write "sound"
-	elsif hash == "9906"
-		$data.write "chara"
-	elsif hash == "9a1f"
-		$data.write "start"
-	elsif hash == "a242"
-		$data.write "demo"
-	elsif hash == "b96e"
-		$data.write "print"
-	elsif hash == "c091"
-		$data.write "map"
-	elsif hash == "c8bb"
-		$data.write "load"
-	elsif hash == "dbab"
-		$data.write "ntrap"
-	elsif hash == "e43c"
-		$data.write "str_status"
-	elsif hash == "ec9d"
-		$data.write "jimaku"
-	elsif hash == "eee9"
-		$data.write "camera"
-
-
-	elsif hash == "6d43"
-		$data.write "00a_o1"
-	elsif hash == "6d44"
-		$data.write "00a_o2"
-	elsif hash == "6d45"
-		$data.write "00a_o3"
-	elsif hash == "6d46"
-		$data.write "00a_o4"
-	elsif hash == "6da3"
-		$data.write "00a_r1"
-	elsif hash == "6da4"
-		$data.write "00a_r2"
-	elsif hash == "7693"
-		$data.write "sne_wet2"
-	elsif hash == "c661"
-		$data.write "00a"
-	elsif hash == "e224"
-		$data.write "null"
-	elsif hash == "e8fe"
-		$data.write "sne_00a"
-
-
-
-
-
-	elsif hash == "21ca"
-		$data.write "Solid_Snake"
-	elsif hash == "6588"
-		$data.write "Roy_Campbell"
-	elsif hash == "9475"
-		$data.write "Naomi"
-	elsif hash == "95f2"
-		$data.write "Meryl"
-	elsif hash == "d78a"
-		$data.write "Mei_Ling"
-	elsif hash == "7982"
-		$data.write "Cyborg_Ninja"
-	elsif hash == "33af"
-		$data.write "Unknown01"
-	elsif hash == "6c22"
-		$data.write "Master_Miller"
-	elsif hash == "3d2c"
-		$data.write "Otacon"
-	elsif hash == "fb95"
-		$data.write "Jim_Houseman"
-	elsif hash == "7c90"
-		$data.write "Unknown00"
-	else
-		$data.write "#{hash}"
-	end
+  if $HASH_MAP.has_key? hash
+    $data.write $HASH_MAP[hash]
+  else
+    $data.write "#{hash}"
+  end
 end
