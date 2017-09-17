@@ -1,5 +1,6 @@
 # coding: utf-8
 system("cls")
+require 'digest'
 require 'fileutils'
 
 $CHARACTER_MAP = {
@@ -344,20 +345,20 @@ $CHARACTER_MAP = {
 	"9037" => "線".unpack("H*"),
 	"903f" => "毒".unpack("H*"),
 
-	"9601" => "気".unpack("H*"),
-	"9602" => "仕".unpack("H*"),
-	"9603" => "掛".unpack("H*"),
-	"9604" => "肉".unpack("H*"),
-	"9605" => "壁".unpack("H*"),
-	"9606" => "何".unpack("H*"),
-	"9607" => "本".unpack("H*"),
-	"9608" => "出".unpack("H*"),
-	"9609" => "触".unpack("H*"),
-	"960a" => "扉".unpack("H*"),
-	"960b" => "閉".unpack("H*"),
-	"960c" => "吹".unpack("H*"),
-	"960d" => "命".unpack("H*"),
-	"960e" => "進".unpack("H*"),
+	"d8f1a5a8b41006b91b946303e4e11f1b" => "気".unpack("H*"),
+	"8f4b4413694065bf59748c041f758fb4" => "仕".unpack("H*"),
+	"1f18bbcda5146256489165c93a457e5d" => "掛".unpack("H*"),
+	"047d54ae745b76ac2ac216c15b21f0eb" => "肉".unpack("H*"),
+	"2e6c6b893224866b5d3c6b93a5c7710d" => "壁".unpack("H*"),
+	"33e15123073b6ffc39b9c58cda7fa688" => "何".unpack("H*"),
+	"4966d3fca0ee883cada78883083eb9d9" => "本".unpack("H*"),
+	"174176e9cb1b9587995648a425518317" => "出".unpack("H*"),
+	"a00ab7e373bffbdfe3808418a6ffad6c" => "触".unpack("H*"),
+	"843e6271cb0e1b06ecd5474aab97dc05" => "扉".unpack("H*"),
+	"0cf00755b700ee5168f9ab0667214a08" => "閉".unpack("H*"),
+	"cad1f9a02ec8eb54d491140dfae53cc2" => "吹".unpack("H*"),
+	"49cb0a01903cbfaa11b894c748742693" => "命".unpack("H*"),
+	"81e463638d7491cb69038013c861292d" => "進".unpack("H*"),
 
 	"c123" => "っ".unpack("H*"),
 	"c147" => "ょ".unpack("H*"),
@@ -392,7 +393,7 @@ def dat2tga(file)
 #	puts "done"
 end
 
-def getText(data)
+def getText(data, extraChar)
 	# Go byte by byte, if the byte isn't an ASCII char,
 	# try a pair of bytes and check if part of the character map
 	bytes_unpckt = data.unpack("H*")[0]
@@ -404,6 +405,15 @@ def getText(data)
 		bytes_unpckt[0] = ''
 		if current_char != '1f' && current_char < '7f' # If printable
 			res += current_char
+		elsif current_char == '96' || current_char == '97' || current_char == '98' || current_char == '99' || current_char == '9a' || current_char == '9b'
+			current_char += bytes_unpckt[0..1]
+			bytes_unpckt[0] = ''
+			bytes_unpckt[0] = ''
+			if $CHARACTER_MAP.has_key? extraChar[current_char.hex - 38401]
+				res += $CHARACTER_MAP[extraChar[current_char.hex - 38401]][0]
+			else
+				res += current_char
+			end
 		else
 			current_char += bytes_unpckt[0..1]
 			bytes_unpckt[0] = ''
@@ -454,7 +464,7 @@ def faceImage(hash)
 	return hash
 end
 
-def dat2txt(data, space)
+def dat2txt(data, space, extraChar)
 	pos		= 0
 	noSet	= false
 	len10	= 2
@@ -467,7 +477,7 @@ def dat2txt(data, space)
 			actor	= actorName(data[pos + 3, 2].unpack("H*")[0])
 			face	= faceImage(data[pos + 5, 2].unpack("H*")[0])
 			unk00	= data[pos + 7, 2].unpack("H*")[0]
-			$radio.write "#{space}TEXT #{actor} #{face} #{unk00} #{getText(data[pos + 9, length - 10])}"
+			$radio.write "#{space}TEXT #{actor} #{face} #{unk00} #{getText(data[pos + 9, length - 10], extraChar)}"
 			pos		+= length
 		elsif code == "02"
 		# set Voice
@@ -586,13 +596,42 @@ def dat2txt(data, space)
 	$radio.write "\r\n\r\n"
 end
 
-file	= IO.binread("RADIO_es.DAT")
+file	= IO.binread("RADIO_jp.DAT")
 
 offset	= 0			# Offset on where it should start
 name	= -1		# Gives a name to bitmap
 FileUtils::mkdir_p "extra"
 $radio	= File.new("radio_.txt", "wb")
 #$radio.write ["efbbbf"].pack("H*")
+
+extraChar	= []
+while 0 == 0
+	break if offset == file.length
+	isFreq		= file[offset, 2].unpack("H*")[0].hex
+	# It's text or bitmap?
+	if isFreq >= 14000 && isFreq <= 14300
+		# Text
+		size	= file[offset + 9, 2].unpack("H*")[0].hex
+		offset	+= size + 9
+#	elsif isFreq == 0
+#		offset += (0x800 - (offset%0x800))
+	else
+		# Bitmap
+		char	= Digest::MD5.hexdigest file[offset, 36]
+		if extraChar.include? char
+		else
+			extraChar.push(char)
+			name	+= 1
+			$data	= File.new("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat", "wb")
+			$data.write file[offset, 36]
+			$data.close
+			dat2tga("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat")
+		end
+		offset	+= 36
+	end
+end
+
+offset	= 0
 while 0 == 0
 	break if offset == file.length
 	isFreq		= file[offset, 2].unpack("H*")[0].hex
@@ -606,18 +645,12 @@ while 0 == 0
 		flag	= file[offset + 8].unpack("H*")[0]
 		size	= file[offset + 9, 2].unpack("H*")[0].hex
 		$radio.write "#{(freq / 100.00).to_s.ljust(6, "0")} #{unk0} #{unk1} #{unk2}"
-		dat2txt(file[offset + 8, size+1], "")
+		dat2txt(file[offset + 8, size+1], "", extraChar)
 		offset	+= size + 9
 #	elsif isFreq == 0
 #		offset += (0x800 - (offset%0x800))
 	else
 		# Bitmap
-		name	+= 1
-		$radio.write "bitmap_#{name}\r"
-		$data	= File.new("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat", "wb")
-		$data.write file[offset, 36]
-		$data.close
-		dat2tga("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat")
 		offset	+= 36
 	end
 end
