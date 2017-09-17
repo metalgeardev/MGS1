@@ -622,10 +622,10 @@ while 0 == 0
 		else
 			extraChar.push(char)
 			name	+= 1
-			$data	= File.new("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat", "wb")
+			$data	= File.new("extra/#{char}.dat", "wb")
 			$data.write file[offset, 36]
 			$data.close
-			dat2tga("extra/bitmap_#{name.to_s.rjust(5, "0")}.dat")
+			dat2tga("extra/#{char}.dat")
 		end
 		offset	+= 36
 	end
